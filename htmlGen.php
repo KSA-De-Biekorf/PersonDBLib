@@ -20,4 +20,13 @@ function tableRow($cells) {
     echo "</tr>";
 }
 
+/** Returns a string with the ban ids replaced by the ban name (short form) */
+function replaceBan($str) {
+    return str_replace(
+        [0, 1, 2, 3, 4, 5, 6, 7],
+        ["kab", "pag", "jkn", "kn", "jhn", "leiding", "vwb", "oud-leiding"],
+        $str
+    );
+}
+
 ?>
