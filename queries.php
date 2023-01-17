@@ -7,12 +7,12 @@ define("Q_ALL", "SELECT Persons.id, Persons.first_name as `voornaam`, Persons.la
  * @return mysqli_result|bool the database result. Use `$result->fetch_row()`
  * to iterate over the query result's rows.
  */
-function queryAll($conn) {
+function query_all($conn) {
     return $conn->query(constant("Q_ALL"));
 }
 
 /** Query all emails from a ban, does not filter out any data */
-function queryBan($conn, $ban) {
+function query_ban($conn, $ban) {
     $banS = $conn->real_escape_string($ban);
     return $conn->query("
 SELECT Persons.first_name, Persons.last_name, Emails.email FROM Persons
@@ -23,9 +23,34 @@ WHERE Bannen.ban = $banS
 }
 
 /** Add a person to the database */
-function addPerson(firstname, lastname, emails) {
-	firstNS = $conn->real_escape_string($firstname);
-	lastNS = $conn->real_escape_string($lastname);
+function add_person($firstname, $lastname, $emails, $bannen) {
+	$firstNS = $conn->real_escape_string($firstname);
+	$lastNS = $conn->real_escape_string($lastname);
+	
+	if (!$conn->query("
+INSERT INTO Persons (first_name, last_name)
+VALUES ($firstNS, $lastNS)
+")) {
+		die($conn->err)
+	}
+
+	# Get person's id 
+	$person_id = $conn->query("SELECT MAX(id) FROM Persons WHERE Persons.first_name = $firstNS AND last_name = $lastNS");
+	if (!person_id) {
+		die("Could not retrieve person's id: " . $conn->error);
+	}
+
+	# add emails
+	foreach ($emails as $email) {
+		add_email($person_id, $email);
+	}
+
+	# add bannen
+
+}
+
+/** Add an email to a person */
+function add_email($id, $email) {
 	
 }
 
