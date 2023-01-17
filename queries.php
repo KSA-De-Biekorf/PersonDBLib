@@ -29,29 +29,40 @@ function add_person($firstname, $lastname, $emails, $bannen) {
 	
 	if (!$conn->query("
 INSERT INTO Persons (first_name, last_name)
-VALUES ($firstNS, $lastNS)
+VALUES ('$firstNS', '$lastNS')
 ")) {
-		die($conn->err)
+		die("Could not add new person" . $conn->err)
 	}
 
 	# Get person's id 
-	$person_id = $conn->query("SELECT MAX(id) FROM Persons WHERE Persons.first_name = $firstNS AND last_name = $lastNS");
-	if (!person_id) {
+	$person_id = $conn->query("SELECT MAX(id) FROM Persons WHERE Persons.first_name = '$firstNS' AND last_name = '$lastNS'");
+	if (!$person_id) {
 		die("Could not retrieve person's id: " . $conn->error);
 	}
 
 	# add emails
 	foreach ($emails as $email) {
-		add_email($person_id, $email);
+		if (!add_email($conn, $person_id, $email)) {
+			die("Could not add email to user $person_id: " . $conn->error);
+		}
 	}
 
 	# add bannen
-
+	foreach ($bannen as $ban) {
+		if (!add_ban($conn, $person_id, $ban)) {
+			die("Could not add ban to user $person_id: " . $conn->error);
+		}
+	}
 }
 
 /** Add an email to a person */
-function add_email($id, $email) {
-	
+function add_email($conn, $id, $email) {
+	return $conn->query("INSERT INTO Emails VALUES ($id, '$email')");
+}
+
+/** Add a ban to a person */
+function add_ban($conn, $id, $ban) {
+	return $conn->query("INSERT INTO Bannen VALUES ($id, '$ban')");
 }
 
 ?>
