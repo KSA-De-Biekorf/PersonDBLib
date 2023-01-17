@@ -1,14 +1,33 @@
 <?php
 
-define("Q_ALL", "SELECT Persons.id, Persons.first_name as `voornaam`, Persons.last_name as `achternaam`, GROUP_CONCAT(DISTINCT Bannen.ban) as `bannen`, GROUP_CONCAT(DISTINCT Emails.email) as `emails` FROM Persons INNER JOIN Bannen ON Persons.id = Bannen.person_id INNER JOIN Emails ON Persons.id = Emails.person_id GROUP BY Persons.id");
+define("Q_ALL_PERSONS", "
+SELECT
+	Persons.id,
+	Persons.first_name as `voornaam`,
+	Persons.last_name as `achternaam`,
+	GROUP_CONCAT(DISTINCT par_Ban.short_name) as `bannen`,
+	GROUP_CONCAT(DISTINCT Emails.email) as `emails`
+FROM Persons
+LEFT JOIN Bannen ON Persons.id = Bannen.person_id
+LEFT JOIN Emails ON Persons.id = Emails.person_id
+LEFT JOIN par_Ban ON par_Ban.id = Bannen.ban
+GROUP BY Persons.id
+");
 
 /**
  * @param mysqli $conn a valid database connection via `mysqli`
  * @return mysqli_result|bool the database result. Use `$result->fetch_row()`
  * to iterate over the query result's rows.
  */
-function query_all($conn) {
-    return $conn->query(constant("Q_ALL"));
+function query_all_persons($conn) {
+    return $conn->query(constant("Q_ALL_PERSONS"));
+}
+
+/**
+ * Query all persons, with the given filters
+ */
+function query_all_persons_with($conn) {
+	die("TODO");
 }
 
 /** Query all emails from a ban, does not filter out any data */
