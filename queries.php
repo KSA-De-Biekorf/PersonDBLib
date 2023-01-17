@@ -23,7 +23,7 @@ WHERE Bannen.ban = $banS
 }
 
 /** Add a person to the database */
-function add_person($firstname, $lastname, $emails, $bannen) {
+function add_person($conn, $firstname, $lastname, $emails, $bannen) {
 	$firstNS = $conn->real_escape_string($firstname);
 	$lastNS = $conn->real_escape_string($lastname);
 	
@@ -31,14 +31,16 @@ function add_person($firstname, $lastname, $emails, $bannen) {
 INSERT INTO Persons (first_name, last_name)
 VALUES ('$firstNS', '$lastNS')
 ")) {
-		die("Could not add new person" . $conn->err)
+		die("Could not add new person" . $conn->err);
 	}
 
 	# Get person's id 
-	$person_id = $conn->query("SELECT MAX(id) FROM Persons WHERE Persons.first_name = '$firstNS' AND last_name = '$lastNS'");
-	if (!$person_id) {
+	$person_id_result = $conn->query("SELECT MAX(id) FROM Persons WHERE Persons.first_name = '$firstNS' AND last_name = '$lastNS'");
+	if (!$person_id_result) {
 		die("Could not retrieve person's id: " . $conn->error);
 	}
+	$person_id_row = $person_id_result->fetch_row();
+	$person_id = $person_id_row[0];
 
 	# add emails
 	foreach ($emails as $email) {
@@ -53,6 +55,10 @@ VALUES ('$firstNS', '$lastNS')
 			die("Could not add ban to user $person_id: " . $conn->error);
 		}
 	}
+
+	$person_id_result->free_result();
+
+	return $person_id;
 }
 
 /** Add an email to a person */
