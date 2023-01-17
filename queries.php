@@ -22,4 +22,11 @@ WHERE Bannen.ban = $banS
 ");
 }
 
+/** Add a person to the database */
+function addPerson(firstname, lastname, emails) {
+	firstNS = $conn->real_escape_string($firstname);
+	lastNS = $conn->real_escape_string($lastname);
+	
+}
+
 ?>
