@@ -41,9 +41,20 @@ function validate_session_token($conn, $tokenBase64, int $userId): bool {
  * @param $user: encrypted and base64 encoded
  */
 function query_user_id($conn, $user) {
+  $userS = $conn->real_escape_string($user);
   return $conn->query("
     SELECT id FROM auth_Users
-    WHERE user = $user
+    WHERE user = $userS
+  ");
+}
+
+
+function add_user($conn, $user, $pass) {
+  $userS = $conn->real_escape_string($user);
+  $passS = $conn->real_escape_string($pass);
+  return $conn->query("
+  INSERT INTO auth_Users (user, pass)
+  VALUES ($userS, $passS)
   ");
 }
 
