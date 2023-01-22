@@ -6,7 +6,7 @@ function add_sesion_token($conn, $tokenBase64, int $userId, $publicKey) {
   $publicKeyS = $conn->real_escape_string($publicKey);
   return $conn->query("
     INSERT INTO auth_token (token, timeout, user_id, public_key)
-    VALUES ($tokenBase64S, NOW() + INTERVAL 1 HOUR, $userId, $publicKeyS)
+    VALUES ('$tokenBase64S', NOW() + INTERVAL 1 HOUR, $userId, '$publicKeyS')
   ");
 }
 
@@ -18,7 +18,7 @@ function validate_session_token($conn, $tokenBase64, int $userId): bool {
   $result = $conn->query("
     SELECT timeout > NOW() FROM auth_Tokens
     WHERE user_id = $userId
-    AND token = $tokenBase64S
+    AND token = '$tokenBase64S'
   ");
   $total = 0;
   while ($row = $result->fetch_asso()) {
@@ -42,9 +42,10 @@ function validate_session_token($conn, $tokenBase64, int $userId): bool {
  */
 function query_user_id($conn, $user) {
   $userS = $conn->real_escape_string($user);
+	error_log("Querying user id for user $userS");
   return $conn->query("
     SELECT id FROM auth_Users
-    WHERE user = $userS
+    WHERE user = '$userS'
   ");
 }
 
@@ -53,8 +54,8 @@ function add_user($conn, $user, $pass) {
   $userS = $conn->real_escape_string($user);
   $passS = $conn->real_escape_string($pass);
   return $conn->query("
-  INSERT INTO auth_Users (user, pass)
-  VALUES ($userS, $passS)
+    INSERT INTO auth_Users (user, pass)
+    VALUES ('$userS', '$passS')
   ");
 }
 
