@@ -31,7 +31,7 @@ function query_all_persons_with($conn) {
 }
 
 /** Query all emails from a ban, does not filter out any data */
-function query_ban($conn, $ban) {
+function query_ban($conn, int $ban) {
     $banS = $conn->real_escape_string($ban);
     return $conn->query("
 SELECT Persons.first_name, Persons.last_name, Emails.email FROM Persons
@@ -50,7 +50,7 @@ function add_person($conn, $firstname, $lastname, $emails, $bannen) {
 INSERT INTO Persons (first_name, last_name)
 VALUES ('$firstNS', '$lastNS')
 ")) {
-		die("Could not add new person" . $conn->err);
+		die("Could not add new person: " . $conn->err);
 	}
 
 	# Get person's id 
