@@ -1,11 +1,11 @@
 <?php
 
 /** Add a session token that will be invalidated in 1 hour */
-function add_sesion_token($conn, $tokenBase64, int $userId, $publicKey) {
+function add_session_token($conn, $tokenBase64, int $userId, $publicKey) {
   $tokenBase64S = $conn->real_escape_string($tokenBase64);
   $publicKeyS = $conn->real_escape_string($publicKey);
   return $conn->query("
-    INSERT INTO auth_token (token, timeout, user_id, public_key)
+    INSERT INTO auth_Tokens (token, timeout, user_id, public_key)
     VALUES ('$tokenBase64S', NOW() + INTERVAL 1 HOUR, $userId, '$publicKeyS')
   ");
 }
@@ -49,7 +49,6 @@ function query_user_id($conn, $user) {
   ");
 }
 
-
 function add_user($conn, $user, $pass) {
   $userS = $conn->real_escape_string($user);
   $passS = $conn->real_escape_string($pass);
@@ -57,6 +56,15 @@ function add_user($conn, $user, $pass) {
     INSERT INTO auth_Users (user, pass)
     VALUES ('$userS', '$passS')
   ");
+}
+
+# Query (all) valid token entries for the specified user
+function query_token($conn, int $userid) {
+	return $conn->query("
+		SELECT * FROM auth_Tokens
+		WHERE user_id = $userid
+		AND timeout > now();
+	");
 }
 
 ?>
