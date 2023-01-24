@@ -58,12 +58,14 @@ function add_user($conn, $user, $pass) {
   ");
 }
 
-# Query (all) valid token entries for the specified user
+# Query the latest valid token entry for the specified user
 function query_token($conn, int $userid) {
 	return $conn->query("
 		SELECT * FROM auth_Tokens
 		WHERE user_id = $userid
-		AND timeout > now();
+		AND timeout > now()
+		ORDER BY timeout DESC
+		LIMIT 1
 	");
 }
 
