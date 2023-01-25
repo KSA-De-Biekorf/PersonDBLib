@@ -69,4 +69,43 @@ function query_token($conn, int $userid) {
 	");
 }
 
+# Query user permissions
+function query_permissions($conn, int $userid) {
+	return $conn->query("
+		SELECT permission_id FROM auth_Permissions
+		WHERE user_id = $userid
+	");
+}
+
+function query_permission_names($conn) {
+	return $conn->query("
+		SELECT * FROM auth_par_Permissions
+	");
+}
+
+function query_has_permissions($conn, int $userid, array permissions): bool {
+	$result = $conn->query("
+		SELECT * FROM auth_Permissions
+		WHERE user_id = $userid
+	");
+	if (!$result) {
+		return false;
+	}
+
+	while ($row = $result->fetch_assoc) {
+		$permission_id = $row["permission_id"];
+		$current_has_perm = false;
+		foreach ($permissions as $permission) {
+			if ($permission_id == $permission) {
+				$current_has_perm = true;
+				break;
+			}
+		}
+		if (!$current_has_perm) {
+			return false;
+		}
+	}
+	return true;
+}
+
 ?>
